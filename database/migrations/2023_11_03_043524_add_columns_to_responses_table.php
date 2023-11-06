@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('responses', function (Blueprint $table) {
+            // Add session_id column (VARCHAR 100)
+            $table->string('session_id', 100)->comment('unique session identifier for users')->nullable()->after('question_id');
+
+            // Add is_submitted column (BOOLEAN)
+            $table->boolean('is_submitted')->default(false)->after('session_id');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('responses', function (Blueprint $table) {
+            $table->dropColumn(['session_id', 'is_submitted']);
+        });
+    }
+};

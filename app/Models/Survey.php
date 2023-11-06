@@ -12,6 +12,14 @@ class Survey extends Model
 
     protected $fillable = ['title', 'description', 'user_id', 'status'];
 
+    protected $appends = [
+        'respondents'
+    ];
+
+    public function getRespondentsAttribute(){
+        return Response::where('survey_id', $this->survey_id)->groupBy('session_id')->count();
+    }
+
     public function user() {
         return $this->belongsTo(User::class, 'user_id');
     }

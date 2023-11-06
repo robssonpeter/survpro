@@ -11,7 +11,7 @@ class Response extends Model
 
     protected $primaryKey = 'response_id';
 
-    protected $fillable = ['question_id', 'response_text'];
+    protected $fillable = ['question_id', 'response_text', 'session_id', 'is_submitted', 'survey_id'];
 
     public function question() {
         return $this->belongsTo(Question::class, 'question_id');
