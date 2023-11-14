@@ -107,7 +107,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
                     <!-- End of Settings -->
                     <!-- New Survey Questions -->
                     <section v-if="current_tab==='questions'">
-                        <SurveyAdminQuestions :survey="$page.props.survey" :questions="$page.props.questions" />
+                        <SurveyAdminQuestions />
                     </section>
                     <!-- End New Survey Questions -->
                 </div>

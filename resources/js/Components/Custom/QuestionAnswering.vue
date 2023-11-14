@@ -1,6 +1,6 @@
 <template>
     <div class="mb-4">
-        <div class="question">{{ index + 1 }}. {{ question.question_text }}</div>
+        <div class="question font-semibold">{{ index + 1 }}. {{ question.question_text }}</div>
         <InputType :disabled="submitted" :options="questionOptions" :value="answer" :questionType="question.question_type" @input="handleInput" />
         <div
             class="px-5"

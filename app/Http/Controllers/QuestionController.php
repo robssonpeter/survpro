@@ -41,4 +41,27 @@ class QuestionController extends Controller
         // Return the updated or created question
         return response()->json(['question' => $question]);
     }
+
+    public function deleteQuestion(Request $request, $id)
+    {
+        // Find the question by ID
+        $question = Question::find($id);
+
+        // Check if the question exists
+        if (!$question) {
+            return response()->json(['error' => 'Question not found'], 404);
+        }
+
+        try {
+            // Delete the question
+            $question->delete();
+
+            // You might want to update the survey or perform other actions here
+
+            return response()->json(['message' => 'Question deleted successfully']);
+        } catch (\Exception $e) {
+            // Handle any exceptions that occur during deletion
+            return response()->json(['error' => 'Failed to delete question'], 500);
+        }
+    }
 }

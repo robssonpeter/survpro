@@ -20,8 +20,8 @@ class Question extends Model
         ['type' => 'multiple-choice', 'label' => 'Multiple Choice'],
         ['type' => 'checkbox', 'label' => 'Checkbox'],
         ['type' => 'drop-down', 'label' => 'Dropdown'],
-        ['type' => 'linear-scale', 'label' => 'Linear Scale'],
-        ['type' => 'file-upload', 'label' => 'File Upload'],
+        /*['type' => 'linear-scale', 'label' => 'Linear Scale'],
+        ['type' => 'file-upload', 'label' => 'File Upload'],*/
         ['type' => 'date', 'label' => 'Date'],
         ['type' => 'time', 'label' => 'Time']
     ];

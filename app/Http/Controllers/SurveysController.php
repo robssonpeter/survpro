@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BrodcastSurveyResponses;
 use App\Http\Requests\SurveyRequest;
 use App\Mail\SurveyEmail;
 use App\Models\Question;
@@ -162,5 +163,11 @@ class SurveysController extends Controller
         // You can add additional logic here, such as sending a response or a confirmation message
 
         return back(); // Redirect back to the surveys list page
+    }
+
+    public function responses($survey_id){
+        broadcast(new BrodcastSurveyResponses("broadcasting "));
+        $questions = Question::where('survey_id', $survey_id)->pluck('question_id');
+        return Response::whereIn('question_id', $questions)->get();
     }
 }

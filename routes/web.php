@@ -20,6 +20,7 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
+    return redirect('/login');
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -29,7 +30,10 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $surveys = \App\Models\Survey::orderBy('survey_id', 'DESC')->limit(5)->get();
+    $survey_count = \App\Models\Survey::count();
+    $responses_count = \App\Models\Response::/*groupBy('session_id')->*/count();
+    return Inertia::render('Dashboard', compact('surveys', 'survey_count', 'responses_count'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -43,6 +47,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/questions', [QuestionController::class, 'index'])->name('questions.index');
     Route::get('/admin/questions/create', [QuestionController::class, 'create'])->name('questions.create');
     Route::post('/admin/question/store', [QuestionController::class, 'store'])->name('questions.store');
+    Route::delete('/survey/questions/{id}', [QuestionController::class, 'deleteQuestion'])->name('questions.delete');
+
 
     /**
      * Surveys related routes
@@ -50,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/surveys', [SurveysController::class, 'index'])->name('surveys.index');
     Route::get('/admin/survey/{slug}', [SurveysController::class, 'modify'])->name('survey.modify');
     Route::get('/admin/surveys/create', [SurveysController::class, 'create'])->name('surveys.create');
+    Route::get('/admin/responses/{survey_id}', [SurveysController::class, 'responses'])->name('surveys.responses');
     Route::post('/admin/surveys', [SurveysController::class, 'store'])->name('surveys.store');
     Route::post('/admin/surveys/send', [SurveysController::class, 'sendSurvey'])->name('survey.send');
     Route::delete('/admin/surveys/{survey_id}', [SurveysController::class, 'delete'])->name('survey.delete');

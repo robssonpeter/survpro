@@ -28,7 +28,7 @@
                     </div>
 
                     <!-- If the survey hasn't been submitted, show the questions -->
-                    <div v-else class="py-2">
+                    <div v-else class="p-4 bg-white rounded-xl">
                         <div v-for="(question, index) in survey.questions" :key="question.id">
                             <question-answering :responses="$page.props.responses" :session_id="$page.props.participantId" class="w-full" :questionType="question.question_type" :index="index" :question="question" @answer="handleAnswer" />
                         </div>

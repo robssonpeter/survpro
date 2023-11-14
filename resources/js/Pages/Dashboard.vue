@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -17,13 +17,13 @@ import { Head } from '@inertiajs/vue3';
                     <!-- Card 1: Total Surveys -->
                     <div class="bg-white p-4 rounded-lg shadow-md">
                         <h2 class="text-lg font-semibold mb-2">Total Surveys</h2>
-                        <p class="text-3xl">235</p>
+                        <p class="text-3xl">{{ $page.props.survey_count }}</p>
                     </div>
 
                     <!-- Card 2: Survey Responses -->
                     <div class="bg-white p-4 rounded-lg shadow-md">
                         <h2 class="text-lg font-semibold mb-2">Survey Responses</h2>
-                        <p class="text-3xl">4,562</p>
+                        <p class="text-3xl">{{ $page.props.responses_count }}</p>
                     </div>
 
                     <!-- Card 3: Active Users -->
@@ -35,32 +35,27 @@ import { Head } from '@inertiajs/vue3';
                     <!-- Recent Surveys Table -->
                     <div class="bg-white p-4 rounded-lg shadow-md col-span-3">
                         <h2 class="text-lg font-semibold mb-4">Recent Surveys</h2>
-                        <table class="w-full">
+                        <table class="table">
                             <thead>
                             <tr>
-                                <th>Title</th>
+                                <th class="float-left">Title</th>
                                 <th>Status</th>
-                                <th>Responses</th>
+                                <th>Respondents</th>
                                 <th>Created At</th>
                                 <th>Actions</th> <!-- New column for actions -->
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td><a href="#">Survey 1</a></td>
-                                <td><span class="bg-green-200 text-green-800 p-2 rounded-full">Active</span></td>
-                                <td>124</td>
-                                <td>Oct 15, 2023</td>
+                            <tr v-for="survey in $page.props.surveys" class="py-2">
+                                <td class="font-semibold text-gray-500"><Link :href="route('survey.modify', survey.hashslug)">{{ survey.title }}</Link></td>
                                 <td>
-                                    <a href="#" class="text-blue-600">Edit</a>
-                                    <a href="#" class="text-red-600 ml-2">Delete</a>
+                                    <br>
+                                    <span v-if="survey.status === 'published'" :class="`bg-green-200 my-2 text-green-800 p-2 rounded-full`">Active</span>
+                                    <span v-if="survey.status === 'closed'" :class="`bg-red-200 my-2 text-green-800 p-2 rounded-full`">Closed</span>
+                                    <span v-if="survey.status === 'draft'" :class="`bg-gray-200 my-2 text-green-800 p-2 rounded-full`">Draft</span>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td><a href="#">Survey 2</a></td>
-                                <td><span class="bg-red-200 text-red-800 p-2 rounded-full">Closed</span></td>
-                                <td>432</td>
-                                <td>Oct 10, 2023</td>
+                                <td><span class="text-center">{{ survey.respondents }}</span></td>
+                                <td>Oct 15, 2023</td>
                                 <td>
                                     <a href="#" class="text-blue-600">Edit</a>
                                     <a href="#" class="text-red-600 ml-2">Delete</a>
@@ -73,7 +68,7 @@ import { Head } from '@inertiajs/vue3';
 
                     <!-- New Surveys Button -->
                     <div class="col-span-3">
-                        <a href="#" class="bg-blue-500 text-white py-2 px-4 rounded-md inline-block">Create New Survey</a>
+                        <Link :href="route('surveys.create')" class="bg-blue-500 text-white py-2 px-4 rounded-md inline-block">Create New Survey</Link>
                     </div>
                 </div>
             </div>
