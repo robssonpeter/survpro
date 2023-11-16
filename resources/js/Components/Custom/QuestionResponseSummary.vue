@@ -1,10 +1,10 @@
 <template>
     <div class="card bg-white shadow-md flex-grow p-4 mb-4">
-        <span>{{ surveyStore.questions[index].question_text }}</span>
+        <span class="font-bold">{{ surveyStore.questions[index].question_text }}</span>
 <!--        <span>{{ classifiedResponses() }}</span>-->
         <small>{{ responses.length }} Responses</small>
         <section style="max-height: 500px; overflow-y: auto" v-if="isGroupable">
-            <div v-for="response in classifiedResponses()" v-if="question.question_type === 'paragraph'" class="bg-gray-200 p-2 rounded-md mb-2">
+            <div v-for="response in classifiedResponses()" class="bg-gray-200 p-2 rounded-md mb-2">
                 <span>{{ response.response_text }}</span>
             </div>
         </section>
