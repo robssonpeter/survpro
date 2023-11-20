@@ -60,6 +60,25 @@ export const useSurveyStore = defineStore('surveyStore', {
 
             // Convert the object values to an array
             return Object.values(groupedResponses);
+        },
+        classifyCheckboxResponses(responses) {
+            const classifiedCheckboxResponses = {};
+
+            //console.log(responses)
+            responses.forEach((response) => {
+                // Assuming response.response_text is an array for checkbox-type questions
+                const checkboxAnswers = JSON.parse(response.response_text);
+
+                checkboxAnswers.forEach((answer) => {
+                    if (!classifiedCheckboxResponses[answer]) {
+                        classifiedCheckboxResponses[answer] = 0;
+                    }
+
+                    classifiedCheckboxResponses[answer] += 1;
+                });
+            });
+
+            return classifiedCheckboxResponses;
         }
     }
 })

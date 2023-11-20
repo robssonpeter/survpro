@@ -3,6 +3,9 @@
         <span class="font-bold">{{ surveyStore.questions[index].question_text }}</span>
 <!--        <span>{{ classifiedResponses() }}</span>-->
         <small>{{ responses.length }} Responses</small>
+        <section style="max-height: 500px; overflow-y: auto" v-if="surveyStore.questions[index].question_type === 'checkbox'">
+            <canvas ref="checkboxChart" :id="`checkbox-chart-${index}`"></canvas>
+        </section>
         <section style="max-height: 500px; overflow-y: auto" v-if="isGroupable">
             <div v-for="response in classifiedResponses()" class="bg-gray-200 p-2 rounded-md mb-2">
                 <span>{{ response.response_text }}</span>
@@ -49,7 +52,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { useSurveyStore } from "@/Stores/SurveyStore.js";
-import Chart from "chart.js/auto";
+import { Chart, CategoryScale, LinearScale, BarController } from "chart.js/auto";
 
 export default {
     name: "QuestionResponseSummary",
@@ -175,14 +178,15 @@ export default {
 
         onMounted(() => {
             const myChartRef = ref(null);
+            const checkboxCharRef = ref(null);
             myChartRef.value = document.getElementById(`chart-${props.index}`)
+            checkboxCharRef.value = document.getElementById(`checkbox-chart-${props.index}`)
             /*setTimeout(()=> {
                 console.log)
             }, 100)*/
 
             if (myChartRef.value){
                 const ctx = document.getElementById(`chart-${props.index}`).getContext('2d');
-                console.log()
 
                 new Chart(ctx, {
                     type: 'bar',
@@ -204,6 +208,44 @@ export default {
                         }
                     }
                 });
+            }
+            // for checkbox chart
+            if (checkboxCharRef.value){
+                const ctxb = document.getElementById(`checkbox-chart-${props.index}`).getContext('2d');
+                const data = {
+                    labels: Object.keys(surveyStore.classifyCheckboxResponses(responses.value)),
+                    datasets: [
+                        {
+                            label: 'Response Count',
+                            data: Object.values(surveyStore.classifyCheckboxResponses(responses.value)),
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)', // Adjust the color as needed
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                        },
+                    ],
+                };
+
+                const options = {
+                    indexAxis: 'y',
+                    xLabels: 'Count',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Responses',
+                            },
+                        },
+                    },
+                };
+                new Chart(ctxb, {
+                    type: 'bar',
+                    data,
+                    options,
+                });
+
             }
             if (surveyStore.questions[props.index].question_type === 'date'){
                 console.log(classifyResponsesByDate(responses.value))
