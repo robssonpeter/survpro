@@ -31,6 +31,7 @@ export const useSurveyStore = defineStore('surveyStore', {
             created_at: '',
             updated_at: '',
         },
+        responses: [],
     }),
     actions: {
         classifiedResponses (question_index) {
@@ -79,6 +80,29 @@ export const useSurveyStore = defineStore('surveyStore', {
             });
 
             return classifiedCheckboxResponses;
+        },
+        classifyIndividualResponses(responses) {
+            const classifiedResponses = {};
+
+            responses.forEach(response => {
+                const sessionId = response.session_id;
+
+                // Check if the session_id is already a key in the classifiedResponses object
+                if (!classifiedResponses[sessionId]) {
+                    // If not, create a new array for that session_id
+                    classifiedResponses[sessionId] = [];
+                }
+
+                // Add the response to the array for the corresponding session_id
+                classifiedResponses[sessionId].push(response);
+            });
+
+            return classifiedResponses;
         }
-    }
+    },
+    getters: {
+        response_count: (state) => {
+            return Object.keys(state.classifyIndividualResponses(state.responses)).length
+        }
+    },
 })

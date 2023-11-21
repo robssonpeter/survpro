@@ -1,7 +1,7 @@
 <template>
     <div class="card bg-white shadow-md flex-grow mb-4">
         <div class="card-body">
-            <h2 class="card-title">3 Responses</h2>
+            <h2 class="card-title">{{ surveyStore.response_count }} Responses</h2>
         </div>
         <section class="flex">
             <div class="flex-grow"></div>
@@ -15,6 +15,8 @@
     </div>
     <QuestionResponseSummary v-if="current_response_tab === 'summary'" :index="index" v-for="(question, index) in surveyStore.questions" />
     <QuestionResponsesView v-if="current_response_tab === 'question'" />
+    <IndividualResponsesView v-if="current_response_tab === 'individual'" />
+
     <div class="card bg-white shadow-md flex-grow mb-4">
         <div class="card-body" v-if="!surveyStore.responses.length">
             <span>Responses will be visible here</span>
@@ -25,6 +27,7 @@
 <script>
 import QuestionResponseSummary from '@/Components/Custom/QuestionResponseSummary.vue';
 import QuestionResponsesView from '@/Components/Custom/QuestionResponsesView.vue';
+import IndividualResponsesView from '@/Components/Custom/IndividualResponsesView.vue';
 import { useSurveyStore } from "@/Stores/SurveyStore.js";
 import { ref, computed } from 'vue'
 import axios from 'axios'
@@ -33,7 +36,7 @@ import io from 'socket.io-client'
 export default {
     name: "SurveyAdminResponses",
     components: {
-        QuestionResponseSummary, QuestionResponsesView
+        QuestionResponseSummary, QuestionResponsesView, IndividualResponsesView
     },
     computed: {
         activeTab() {
