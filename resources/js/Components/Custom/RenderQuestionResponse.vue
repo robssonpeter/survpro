@@ -1,7 +1,7 @@
 <template>
-<!--    <span>{{response}}</span>-->
-<!--    <span>{{ surveyStore.questions }}</span>-->
-    <span>{{ question.question_text }}</span>
+<!--    <span>{{ response.question_id }}</span>-->
+    <section v-if="response && Object.keys(response).length > 2">
+    <span><strong>{{ question.question_text }}</strong></span>
     <section v-if="question.question_type === 'checkbox' && question.options">
         <section v-for="option in question.options">
             <input type="checkbox" :checked="selectedOptions.indexOf(option.text) > -1" disabled class="checkbox" /> <span>{{ option.text }}</span>
@@ -10,6 +10,7 @@
     <div v-else>
         <span style="text-decoration: underline dotted">{{ response.response_text }}</span>
     </div>
+    </section>
 </template>
 
 <script>

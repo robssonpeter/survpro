@@ -18,13 +18,20 @@
         </div>
     </div>
 
-<!--    <span>{{JSON.stringify(responses)}}</span>-->
-    <div class="card w-full bg-white shadow-xl mt-4" v-for="response in responses[currentParticipant]">
+<!--    <div class="card w-full bg-white shadow-xl mt-4" v-for="response in responses[currentParticipant]">-->
+    <div class="card w-full bg-white shadow-xl mt-4" v-for="(question, index) in surveyStore.questions">
         <div class="card-body">
-<!--            <span>{{ participants }}</span>-->
-<!--            <span>{{ surveyStore.response_count }}</span>
-            <span>{{ responses }}</span>-->
-            <RenderQuestionResponse :response="response" />
+            <section class="flex space-x-2" v-if="!questionResponse(question.question_id)">
+                <span>{{index+1}}. </span>
+                <section class="flex flex-col" >
+                    <span><strong>{{ question.question_text }}</strong></span>
+                    <div style="border-bottom: 1px dotted gray"><span class="invisible">N/A</span></div>
+                </section>
+            </section>
+            <section class="flex space-x-2" v-else>
+                <span>{{index+1}}. </span>
+                <RenderQuestionResponse :response="questionResponse(question.question_id)" />
+            </section>
         </div>
     </div>
 </template>
@@ -52,6 +59,19 @@ export default {
         })
 
         const currentParticipant = ref()
+
+        const questionResponse = computed(() => {
+            return (question_id) => {
+                if (responses.value[currentParticipant.value]){
+                    return responses.value[currentParticipant.value].find(resp => resp.question_id === question_id);
+                }
+                // return an object with question id to avoid errors
+                return {
+                    question_id: question_id,
+                    response_text: null,
+                }
+            }
+        })
 
         const classifyResponsesBySession = (responses) => {
             const classifiedResponses = {};
@@ -98,6 +118,7 @@ export default {
             responses,
             participants,
             currentParticipant,
+            questionResponse,
             classifyResponsesBySession,
             upIndex,
             downIndex
