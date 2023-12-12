@@ -23,6 +23,7 @@
         "vue": "^3.2.41"
     },
     "dependencies": {
+        "@inertiajs/inertia": "^0.11.1",
         "@inertiajs/vue3": "^1.0.14",
         "@vueup/vue-quill": "^1.2.0",
         "animate.css": "^4.1.1",

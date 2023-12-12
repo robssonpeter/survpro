@@ -6,15 +6,21 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
     <AuthenticatedLayout>
         <template #header>
             <div class="flex">
-                <h2 class="font-semibold self-center flex-grow text-xl text-gray-800 leading-tight">{{ newSurvey.title.length?newSurvey.title:'New Survey' }}</h2>
-                <button onclick="document.getElementById('my_modal_1').showModal()" v-if="newSurvey.status === 'published'" class="btn btn-primary self-center">Share</button>
+                <h2 class="font-semibold self-center flex-grow text-xl text-gray-800 leading-tight">
+                    {{ newSurvey.title.length ? newSurvey.title : 'New Survey' }}</h2>
+                <button onclick="document.getElementById('my_modal_1').showModal()"
+                        v-if="newSurvey.status === 'published'" class="btn btn-primary self-center">Share
+                </button>
             </div>
             <section class="flex -mb-6" v-if="newSurvey.status !== 'draft'">
                 <div class="flex-grow"></div>
                 <div class="tabs">
-                    <a :class="`tab hover:text-primary tab-bordered ${current_tab === 'questions'?activeTab:''}`" @click="currentTab('questions')">Questions</a>
-                    <a :class="`tab hover:text-primary tab-bordered ${current_tab === 'responses'?activeTab:''}`" @click="currentTab('responses')">Responses</a>
-                    <a :class="`tab hover:text-primary tab-bordered ${current_tab === 'settings'?activeTab:''}`" @click="currentTab('settings')">Settings</a>
+                    <a :class="`tab hover:text-primary tab-bordered ${current_tab === 'questions'?activeTab:''}`"
+                       @click="currentTab('questions')">Questions</a>
+                    <a :class="`tab hover:text-primary tab-bordered ${current_tab === 'responses'?activeTab:''}`"
+                       @click="currentTab('responses')">Responses</a>
+                    <a :class="`tab hover:text-primary tab-bordered ${current_tab === 'settings'?activeTab:''}`"
+                       @click="currentTab('settings')">Settings</a>
                 </div>
                 <div class="flex-grow"></div>
             </section>
@@ -65,13 +71,37 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
         </button>
       </span>
                     </div>
+                    <div v-if="share.emails.length">
+                        <input type="checkbox" :checked="share.save_recipients" v-model="share.save_recipients"
+                               class="checkbox checkbox-xs"/><small class="ml-2">Save these recipients for later</small>
+                    </div>
+                    <div v-if="share.save_recipients">
+                        <div class="join w-full">
+                            <div class="w-full">
+                                <div>
+                                    <select v-model="share.save_to_list"
+                                            class="select rounded-r-none select-bordered w-full max-w-xs">
+                                        <option selected value="new">Save to a new list</option>
+                                        <option value="existing">Merge with existing</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <select class="select rounded-l-none select-bordered join-item w-full"
+                                    v-if="share.save_to_list === 'existing'">
+                                <option value="">Select List</option>
+                            </select>
+                            <input v-else type="text" v-model="share.list_name" placeholder="Name the list"
+                                   class="input rounded-l-none w-full input-bordered max-w-xs"/>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-control w-full max-w-xs mb-2">
                     <label class="label">
                         <span class="label-text">Subject</span>
                     </label>
-                    <input type="text"  v-model="share.subject" placeholder="Type here" class="input input-bordered w-full max-w-xs" />
+                    <input type="text" v-model="share.subject" placeholder="Type here"
+                           class="input input-bordered w-full max-w-xs"/>
                 </div>
 
                 <div>
@@ -86,28 +116,30 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
                         <button class="btn btn-neutral">Close</button>
                     </form>
                     <div class="mt">
-                        <button class="btn btn-primary" @click="sendSurvey" :disabled="sendingSurvey"><span class="loading loading-bars loading-md" v-if="sendingSurvey"></span><span v-else>Send</span><!--Send--></button>
+                        <button class="btn btn-primary" @click="sendSurvey" :disabled="sendingSurvey"><span
+                            class="loading loading-bars loading-md" v-if="sendingSurvey"></span><span v-else>Send</span>
+                            <!--Send--></button>
                     </div>
                 </div>
             </div>
         </dialog>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 text-gray-600">
-                <div class="md:px-40 animate__animated animate__fadeIn" >
+                <div class="md:px-40 animate__animated animate__fadeIn">
                     <!-- Responses -->
                     <section v-if="current_tab==='responses'">
-                        <SurveyAdminResponses :survey="newSurvey" />
+                        <SurveyAdminResponses @surveyModify="redirectToSurvey" :survey="newSurvey"/>
                     </section>
                     <!-- End of Responses -->
 
                     <!-- Settings -->
                     <section v-if="current_tab==='settings'">
-                        <SurveyAdminSettings />
+                        <SurveyAdminSettings :settings="$page.props.settings"/>
                     </section>
                     <!-- End of Settings -->
                     <!-- New Survey Questions -->
                     <section v-if="current_tab==='questions'">
-                        <SurveyAdminQuestions :survey="$page.props.survey" :questions="$page.props.questions" />
+                        <SurveyAdminQuestions :survey="$page.props.survey" :questions="$page.props.questions"/>
                     </section>
                     <!-- End New Survey Questions -->
                 </div>
@@ -122,12 +154,13 @@ import RenderQuestion from "@/Components/Custom/RenderQuestion.vue";/*Remove*/
 import SurveyAdminQuestions from "@/Components/Pages/Survey/SurveyAdminQuestions.vue";
 import SurveyAdminResponses from "@/Components/Pages/Survey/SurveyAdminResponses.vue";
 import SurveyAdminSettings from "@/Components/Pages/Survey/SurveyAdminSettings.vue";
-import { useSurveyStore } from "@/Stores/SurveyStore.js";
+import {useSurveyStore} from "@/Stores/SurveyStore.js";
 import axios from "axios";
-import { QuillEditor } from '@vueup/vue-quill';
+import {QuillEditor} from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { ref, watch } from 'vue';
+import {ref, watch, onMounted} from 'vue';
 import swal from 'sweetalert';
+
 export default {
     setup() {
         const editorContent = ref('');
@@ -138,6 +171,10 @@ export default {
             // If you don't want HTML tags, you can use a sanitization library like DOMPurify
             this.share.message = newContent;
         });
+
+        onMounted(() => {
+            alert('setup function is working')
+        })
 
         // Rest of your component setup
 
@@ -150,7 +187,7 @@ export default {
         RenderQuestion, QuillEditor, SurveyAdminQuestions, SurveyAdminResponses, SurveyAdminSettings
     ],
     computed: {
-        activeTab(){
+        activeTab() {
             return 'tab-active text-primary border-b-primary font-semibold'
         }
     },
@@ -165,6 +202,9 @@ export default {
                 emails: [],
                 subject: '',
                 message: '[LINK]',
+                save_recipients: false,
+                save_to_list: 'new',
+                list_name: ''
             },
             editing_survey: {
                 title: false,
@@ -189,21 +229,21 @@ export default {
         };
     },
     mounted() {
-
-        this.survey.name = "hello there";
+        //this.survey.name = "hello there";
         // Fetch surveys from your API and populate the 'surveys' array
-        if(this.$page.props.survey){
+        if (this.$page.props.survey) {
             // set the new survey details
             this.newSurvey = this.$page.props.survey;
             this.questions = this.$page.props.questions;
         }
-        if (this.questions.length > 0){
+        if (this.questions.length > 0) {
             this.updating = this.questions.length - 1
         }
+
         // You can use Inertia's inertia.get() here
     },
     methods: {
-        currentTab(tab, type='current_tab'){
+        currentTab(tab, type = 'current_tab') {
             this[type] = tab;
         },
         handleInput() {
@@ -215,7 +255,7 @@ export default {
                 this.addEmail();
             }
         },
-        updateEditorContent(content){
+        updateEditorContent(content) {
             console.log(content)
             //this.share.message = content
         },
@@ -250,17 +290,17 @@ export default {
             // Emit an event to notify child components about the question removal
             this.$emit('questionRemoved', reference);
         },
-        focus_question(e){
+        focus_question(e) {
             this.updating = e;
             //console.log(document.getElementById(e))
 
         },
-        addClicked(index, position){
+        addClicked(index, position) {
             //console.log(index);
             console.log(position);
             this.addAQuestion(position);
         },
-        addAQuestion(position){
+        addAQuestion(position) {
             //this.updating = (this.questions.length - 1)
             const newQuestion = {
                 question_text: '',
@@ -269,22 +309,25 @@ export default {
                 is_required: false,
             }
 
-            if(position === 'before' || !this.questions.length){
+            if (position === 'before' || !this.questions.length) {
 
-                if(this.updating > 0){
-                    this.questions.splice(this.updating , 0, newQuestion);
+                if (this.updating > 0) {
+                    this.questions.splice(this.updating, 0, newQuestion);
                     this.updating = this.updating - 1;
-                }else{
-                    this.questions.splice(this.updating , 0, newQuestion);
+                } else {
+                    this.questions.splice(this.updating, 0, newQuestion);
                 }
 
                 console.log('the if has run');
-            }else{
+            } else {
                 this.updating = this.updating + 1;
                 this.questions.splice(this.updating, 0, newQuestion);
 
                 console.log("the else has run here")
             }
+        },
+        redirectToSurvey() {
+            alert('you are being redirected');
         },
         async storeSurvey(variable = 'all') {
             if (variable !== 'all') {
@@ -292,14 +335,17 @@ export default {
             }
             console.log(this.newSurvey)
             try {
+                let self = this;
                 const response = await axios.post(route('surveys.store'), this.newSurvey);
                 // Assuming your Laravel route for storing surveys is '/api/surveys'
                 if (response.status === 200 || response.status === 201) {
                     // Survey data has been successfully stored in the database
                     // You can handle the response as needed
                     console.log('Survey data has been stored:', response.data);
-                    if(!this.$page.props.survey){
-                        this.$inertia.visit(route('survey.modify', response.data.stored.hashslug));
+                    if (!this.$page.props.survey) {
+                        selfs.$inertia.visit(route('survey.modify', response.data.stored.hashslug));
+                    } else {
+                        alert('things are here')
                     }
                 } else {
                     // Handle errors or display a message to the user
@@ -370,6 +416,7 @@ export default {
 .slide-fade-enter-active, .slide-fade-leave-active {
     transition: opacity 0.5s, transform 0.5s;
 }
+
 .slide-fade-enter, .slide-fade-leave-to {
     opacity: 0;
     transform: translateY(10px);

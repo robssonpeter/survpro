@@ -81,9 +81,10 @@
 
 <script>
 import RenderQuestion from "@/Components/Custom/RenderQuestion.vue";
-import { ref, onMounted, defineProps, defineEmits } from "vue";
+import { ref, onMounted, defineProps, defineEmits, inject } from "vue";
 import { useSurveyStore } from "@/Stores/SurveyStore.js";
 import axios from "axios";
+import { Inertia } from '@inertiajs/inertia';
 
 export default {
     name: "SurveyAdminQuestions",
@@ -91,7 +92,7 @@ export default {
     components: {
         RenderQuestion
     },
-    setup(props) {
+    setup(props, context) {
         const surveyStore = useSurveyStore();
         const editing_survey = ref({
             title: false,
@@ -114,10 +115,10 @@ export default {
             updated_at: ""
         });
 
-        const emit = defineEmits(['questionRemoved']);
+        const emit = defineEmits(['questionRemoved', 'surveyModify']);
+        const $inertia = inject('$inertia');
 
         onMounted(() => {
-
             if (props.survey) {
                 surveyStore.newSurvey = props.survey
                 //newSurvey.value = props.survey;
@@ -126,7 +127,9 @@ export default {
             if (surveyStore.questions.length > 0) {
                 updating.value = surveyStore.questions.length - 1;
             }
-            fetchSurveyResponses()
+            if(surveyStore.newSurvey.survey_id){
+                fetchSurveyResponses()
+            }
         });
 
         const addAQuestion = (position) => {
@@ -190,7 +193,7 @@ export default {
                 if (response.status === 200 || response.status === 201) {
                     console.log("Survey data has been stored:", response.data);
                     if (!props.survey) {
-                        emit("surveyModify", response.data.stored.hashslug);
+                        Inertia.visit(route('survey.modify', response.data.stored.hashslug));
                     }
                 } else {
                     console.log("Data could not be saved");
@@ -216,7 +219,7 @@ export default {
             storeSurvey,
             addClicked,
             addAQuestion,
-            fetchSurveyResponses
+            fetchSurveyResponses,
         };
     }
 };

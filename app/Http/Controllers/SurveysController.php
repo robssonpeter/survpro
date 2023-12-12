@@ -8,6 +8,7 @@ use App\Mail\SurveyEmail;
 use App\Models\Question;
 use App\Models\Response;
 use App\Models\Survey;
+use App\Models\SurveySetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -35,9 +36,10 @@ class SurveysController extends Controller
     {
         $survey = Survey::where('hashslug', $slug)->first();
         $questions = Question::where('survey_id', $survey->survey_id)->get();
+        $settings = SurveySetting::where('survey_id', $survey->survey_id)->pluck('value', 'key');
         $question_types = Question::$types;
         //dd($questions);
-        return Inertia::render('Surveys/new', compact('question_types', 'questions', 'survey'));
+        return Inertia::render('Surveys/new', compact('question_types', 'questions', 'survey', 'settings'));
     }
 
     public function store(SurveyRequest $request)

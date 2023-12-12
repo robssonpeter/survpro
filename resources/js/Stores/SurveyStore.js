@@ -31,6 +31,9 @@ export const useSurveyStore = defineStore('surveyStore', {
             created_at: '',
             updated_at: '',
         },
+        settings: {
+            'is_timed': false,
+        },
         responses: [],
     }),
     actions: {
@@ -98,6 +101,9 @@ export const useSurveyStore = defineStore('surveyStore', {
             });
 
             return classifiedResponses;
+        },
+        getSetting(key) {
+            return this.settings[key]
         }
     },
     getters: {

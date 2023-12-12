@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\ResponseController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SurveysController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/surveys', [SurveysController::class, 'store'])->name('surveys.store');
     Route::post('/admin/surveys/send', [SurveysController::class, 'sendSurvey'])->name('survey.send');
     Route::delete('/admin/surveys/{survey_id}', [SurveysController::class, 'delete'])->name('survey.delete');
+    Route::post('/save-setting', [SettingsController::class, 'saveSetting'])->name('survey.setting.save');
 // Add more routes for editing and deleting questions
 });
 Route::get('/user/survey/{slug}', [SurveysController::class, 'participate'])->name('survey.participate');
