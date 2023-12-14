@@ -71,9 +71,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
         </button>
       </span>
                     </div>
-                    <div v-if="share.emails.length">
+                    <div v-if="share.emails.length" class="py-2">
                         <input type="checkbox" :checked="share.save_recipients" v-model="share.save_recipients"
-                               class="checkbox checkbox-xs"/><small class="ml-2">Save these recipients for later</small>
+                               class="checkbox checkbox-xs"/><small class="ml-2 mb-2">Save these recipients for later</small>
                     </div>
                     <div v-if="share.save_recipients">
                         <div class="join w-full">
