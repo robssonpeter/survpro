@@ -6,6 +6,7 @@ use App\Events\BrodcastSurveyResponses;
 use App\Http\Requests\SurveyRequest;
 use App\Mail\SurveyEmail;
 use App\Models\Question;
+use App\Models\RecipientList;
 use App\Models\Response;
 use App\Models\Survey;
 use App\Models\SurveySetting;
@@ -131,6 +132,18 @@ class SurveysController extends Controller
 
             // Send the email using the Mailable class
             Mail::to($email)->send(new SurveyEmail($subject, str_replace('[LINK]', $surveyLinkWithRecipient, $message)));
+        }
+
+        // if the check the save recipients option
+        if ($request->input('save_recipients')){
+            if($request->input('save_to_list') == 'new'){
+                // create a new entry
+                $data = [
+                    'name' => $request->input('list_name'),
+                    'recipients' => json_encode($emails),
+                ];
+                $saved_recipients = RecipientList::create($data);
+            }
         }
 
         return response()->json(['message' => 'Survey emails sent successfully']);

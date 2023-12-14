@@ -364,6 +364,9 @@ export default {
                 subject: this.share.subject,
                 message: this.share.message,
                 survey_hash: this.newSurvey.hashslug,
+                save_recipients: this.share.save_recipients,
+                save_to_list: this.share.save_to_list,
+                list_name: this.share.list_name,
             };
 
             try {
