@@ -62,6 +62,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/surveys/send', [SurveysController::class, 'sendSurvey'])->name('survey.send');
     Route::delete('/admin/surveys/{survey_id}', [SurveysController::class, 'delete'])->name('survey.delete');
     Route::post('/save-setting', [SettingsController::class, 'saveSetting'])->name('survey.setting.save');
+
+    /**
+     * Participants Related routes
+     */
+    Route::post('/saved/recipient-lists', [SurveysController::class, 'savedRecipientsList'])->name('saved.recipients-list');
 // Add more routes for editing and deleting questions
 });
 Route::get('/user/survey/{slug}', [SurveysController::class, 'participate'])->name('survey.participate');

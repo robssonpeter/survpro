@@ -28,19 +28,30 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
         <dialog id="my_modal_1" class="modal show">
             <div class="modal-box">
                 <h3 class="font-bold text-lg">Share Survey</h3>
-                <div>
-                    <div class="form-control w-full max-w-xs mb-2 flex">
+                <div class="w-full">
+                    <div class="form-control mb-2 flex">
                         <label class="label">
                             <span class="label-text">Emails</span>
                         </label>
+                        <div class="join">
+                            <select @change="controlExisting" v-model="share.import_from_list" class="select select-bordered join-item">
+                                <option :value="false">Enter</option>
+                                <option :value="true">Import from list</option>
+                            </select>
                         <input
+                            v-if="!share.import_from_list"
                             v-model="newEmail"
                             @input="handleInput"
                             @keydown="handleKeyDown"
                             type="text"
                             placeholder="Type email and press Enter"
-                            class="input input-bordered w-full max-w-xs flex-grow"
+                            class="input input-bordered w-full max-w-xs flex-grow rounded-l-none"
                         />
+                            <select v-model="share.recipient_list_id" @change="selectedList"  v-else class="select w-full select-bordered join-item">
+                                <option value="">Select List</option>
+                                <option :value="list.id" v-for="list in share.recipient_lists">{{ list.name }}</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="tags">
@@ -79,16 +90,20 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
                         <div class="join w-full">
                             <div class="w-full">
                                 <div>
-                                    <select v-model="share.save_to_list"
+                                    <select @change="controlExisting" v-model="share.save_to_list"
                                             class="select rounded-r-none select-bordered w-full max-w-xs">
                                         <option selected value="new">Save to a new list</option>
                                         <option value="existing">Merge with existing</option>
                                     </select>
                                 </div>
                             </div>
-                            <select class="select rounded-l-none select-bordered join-item w-full"
+                            <select
+                                    v-model="share.recipient_list_id"
+                                    @change="selectedList"
+                                    class="select rounded-l-none select-bordered join-item w-full"
                                     v-if="share.save_to_list === 'existing'">
                                 <option value="">Select List</option>
+                                <option :value="list.id" v-for="list in share.recipient_lists">{{ list.name }}</option>
                             </select>
                             <input v-else type="text" v-model="share.list_name" placeholder="Name the list"
                                    class="input rounded-l-none w-full input-bordered max-w-xs"/>
@@ -96,12 +111,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
                     </div>
                 </div>
 
-                <div class="form-control w-full max-w-xs mb-2">
+                <div class="form-control w-full mb-2">
                     <label class="label">
                         <span class="label-text">Subject</span>
                     </label>
                     <input type="text" v-model="share.subject" placeholder="Type here"
-                           class="input input-bordered w-full max-w-xs"/>
+                           class="input input-bordered w-full"/>
                 </div>
 
                 <div>
@@ -202,9 +217,12 @@ export default {
                 emails: [],
                 subject: '',
                 message: '[LINK]',
+                import_from_list: false,
                 save_recipients: false,
                 save_to_list: 'new',
-                list_name: ''
+                list_name: '',
+                recipient_lists: [],
+                recipient_list_id: '',
             },
             editing_survey: {
                 title: false,
@@ -243,6 +261,25 @@ export default {
         // You can use Inertia's inertia.get() here
     },
     methods: {
+        selectedList(){
+            if(this.share.recipient_list_id){
+                alert('something has been seelcted ')
+                // find the contents of that list
+                let list = this.share.recipient_lists.find(lst => lst.id === this.share.recipient_list_id);
+                if(list){
+                    this.share.emails = JSON.parse(list.recipients);
+                }
+            }
+        },
+        controlExisting(){
+          if(this.share.save_to_list === 'existing' || this.share.import_from_list){
+              axios.post(route('saved.recipients-list')).then((result) => {
+                this.share.recipient_lists = result.data;
+              }).catch((error) => {
+                console.error(error);
+              })
+          }
+        },
         currentTab(tab, type = 'current_tab') {
             this[type] = tab;
         },

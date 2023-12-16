@@ -185,4 +185,9 @@ class SurveysController extends Controller
         $questions = Question::where('survey_id', $survey_id)->pluck('question_id');
         return Response::whereIn('question_id', $questions)->get();
     }
+
+    public function savedRecipientsList(){
+        $lists = RecipientList::all();
+        return response()->json($lists);
+    }
 }
