@@ -98,7 +98,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
                                 </div>
                             </div>
                             <select
-                                    v-model="share.recipient_list_id"
+                                    v-model="share.merge_with_list"
                                     @change="selectedList"
                                     class="select rounded-l-none select-bordered join-item w-full"
                                     v-if="share.save_to_list === 'existing'">
@@ -223,6 +223,7 @@ export default {
                 list_name: '',
                 recipient_lists: [],
                 recipient_list_id: '',
+                merge_with_list: '',
             },
             editing_survey: {
                 title: false,
@@ -263,7 +264,6 @@ export default {
     methods: {
         selectedList(){
             if(this.share.recipient_list_id){
-                alert('something has been seelcted ')
                 // find the contents of that list
                 let list = this.share.recipient_lists.find(lst => lst.id === this.share.recipient_list_id);
                 if(list){
@@ -404,6 +404,7 @@ export default {
                 save_recipients: this.share.save_recipients,
                 save_to_list: this.share.save_to_list,
                 list_name: this.share.list_name,
+                merge_with_list: this.share.merge_with_list,
             };
 
             try {

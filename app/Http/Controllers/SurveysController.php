@@ -143,6 +143,17 @@ class SurveysController extends Controller
                     'recipients' => json_encode($emails),
                 ];
                 $saved_recipients = RecipientList::create($data);
+            }else{
+                // the list is supposed to be merged
+                $list_id = $request->input('merge_with_list');
+                $list = RecipientList::find($list_id);
+                if($list){
+                    $old_list = json_decode($list->recipients);
+                    $new_list = array_unique(array_merge($old_list, $emails));
+
+                    // save the updated list to db
+                    RecipientList::where('id', $list_id)->update(['recipients' => json_encode($new_list)]);
+                }
             }
         }
 
