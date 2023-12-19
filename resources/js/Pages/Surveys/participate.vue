@@ -27,6 +27,13 @@
                         </div>
                     </div>
 
+                    <div v-else-if="survey.status === 'closed'">
+                        <div class="bg-danger-100 rounded-xl border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <p><strong class="font-bold">Sorry!</strong></p>
+                            <span class="block sm:inline">This survey is no longer accepting responses!</span>
+                        </div>
+                    </div>
+
                     <!-- If the survey hasn't been submitted, show the questions -->
                     <div v-else class="p-4 bg-white rounded-xl">
                         <div v-for="(question, index) in survey.questions" :key="question.id">

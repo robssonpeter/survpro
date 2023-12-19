@@ -83,6 +83,7 @@ class SurveysController extends Controller
 
     public function participate($slug){
         $survey = Survey::where('hashslug', $slug)->with('questions')->first();
+        //dd($survey);
         if(request()->pid){
             $participantId = request()->pid;
         }else{
