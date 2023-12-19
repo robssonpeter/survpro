@@ -4,13 +4,14 @@
         <div class="card bg-white shadow-md flex-grow">
             <div class="card-body">
                 <div class="flex">
-                    <h2 class="card-title flex-grow" v-if="!editing_survey.title" @click="editing_survey.title = true">
+                    <h2 class="card-title flex-grow" v-if="!editing_survey.title" @click="editSurveyTitle">
                         {{ surveyStore.newSurvey.title ? surveyStore.newSurvey.title : 'Survey Title - (Click to Add)' }}
                     </h2>
                     <input
                         v-if="editing_survey.title"
                         v-model="surveyStore.newSurvey.title"
                         @change="storeSurvey('title')"
+                        id="survey_title_field"
                         type="text"
                         placeholder="Type here and press enter"
                         class="input input-ghost flex-grow w-full max-w-xs focus:bg-gray-50"
@@ -88,7 +89,7 @@ import { Inertia } from '@inertiajs/inertia';
 
 export default {
     name: "SurveyAdminQuestions",
-    props: ['survey', 'questions'],
+    props: ['survey', 'questions', 'inertia'],
     components: {
         RenderQuestion
     },
@@ -98,6 +99,7 @@ export default {
             title: false,
             description: false
         });
+        const survey_title_field = ref('survey_title_field');
         const updating = ref(0);
         const questions = ref([]);
         const new_question = ref({
@@ -118,7 +120,17 @@ export default {
         const emit = defineEmits(['questionRemoved', 'surveyModify']);
         const $inertia = inject('$inertia');
 
+        const editSurveyTitle = () => {
+            editing_survey.value.title = true;
+            // focus on the element
+            setTimeout(() => {
+                document.getElementById('survey_title_field').focus();
+            }, 20);
+
+        }
+
         onMounted(() => {
+            console.log(props.inertia);
             if (props.survey) {
                 surveyStore.newSurvey = props.survey
                 //newSurvey.value = props.survey;
@@ -193,7 +205,8 @@ export default {
                 if (response.status === 200 || response.status === 201) {
                     console.log("Survey data has been stored:", response.data);
                     if (!props.survey) {
-                        Inertia.visit(route('survey.modify', response.data.stored.hashslug));
+                        props.inertia.visit(route('survey.modify', response.data.stored.hashslug));
+                        //Inertia.visit(route('survey.modify', response.data.stored.hashslug));
                     }
                 } else {
                     console.log("Data could not be saved");
@@ -214,12 +227,14 @@ export default {
             new_question,
             surveyStore,
             newSurvey,
+            survey_title_field,
             removeQuestion,
             focus_question,
             storeSurvey,
             addClicked,
             addAQuestion,
             fetchSurveyResponses,
+            editSurveyTitle
         };
     }
 };

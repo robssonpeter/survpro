@@ -154,7 +154,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
                     <!-- End of Settings -->
                     <!-- New Survey Questions -->
                     <section v-if="current_tab==='questions'">
-                        <SurveyAdminQuestions :survey="$page.props.survey" :questions="$page.props.questions"/>
+                        <SurveyAdminQuestions :inertia="$inertia" :survey="$page.props.survey" :questions="$page.props.questions"/>
                     </section>
                     <!-- End New Survey Questions -->
                 </div>
