@@ -9,7 +9,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
                 <h2 class="font-semibold self-center flex-grow text-xl text-gray-800 leading-tight">
                     {{ newSurvey.title.length ? newSurvey.title : 'New Survey' }}</h2>
                 <button onclick="document.getElementById('my_modal_1').showModal()"
-                        v-if="newSurvey.status === 'published'" class="btn btn-primary self-center">Share
+                        v-if="newSurvey.status === 'published'" class="btn btn-primary self-center">Share now
                 </button>
             </div>
             <section class="flex -mb-6" v-if="newSurvey.status !== 'draft'">

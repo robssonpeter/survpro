@@ -52,8 +52,13 @@
       </span>
         </div>
     </div>
-    <div class="flex space-x-8 mb-2" v-for="(question, index) in surveyStore.questions">
-        <RenderQuestion
+        <div class="flex space-x-8 mb-2" v-for="(question, index) in computedQuestions" :key="question.id || index" draggable="true" @dragstart="startDrag(index)" @dragover="dragOver" @drop="drop">
+            <div v-if="placeholderIndex === index && draggedItemIndex !== null" class="placeholder w-full" :style="{ top: placeholderIndex * itemHeight + 'px' }">
+                <!-- Placeholder content (could be a line, an empty div, etc.) -->
+                Placeholder
+            </div>
+            <RenderQuestion
+                v-else
             class="flex-grow"
             :survey_id="$page.props.survey ? $page.props.survey.survey_id : null"
             @deleted="removeQuestion"
@@ -77,15 +82,15 @@
         </svg>
       </span>
         </div>
+
     </div>
 </template>
 
 <script>
 import RenderQuestion from "@/Components/Custom/RenderQuestion.vue";
-import { ref, onMounted, defineProps, defineEmits, inject } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useSurveyStore } from "@/Stores/SurveyStore.js";
 import axios from "axios";
-import { Inertia } from '@inertiajs/inertia';
 
 export default {
     name: "SurveyAdminQuestions",
@@ -117,8 +122,52 @@ export default {
             updated_at: ""
         });
 
-        const emit = defineEmits(['questionRemoved', 'surveyModify']);
-        const $inertia = inject('$inertia');
+        const draggedItemIndex = ref(null);
+        const placeholderIndex = ref(null);
+        const itemHeight = 40; // Adjust as needed
+
+        const startDrag = (index, event) => {
+            //event.preventDefault();
+            draggedItemIndex.value = index;
+        };
+
+        const dragOver = (event) => {
+            event.preventDefault();
+            const rect = event.target.getBoundingClientRect();
+            const mouseY = event.clientY - rect.top;
+            placeholderIndex.value = Math.round(mouseY / itemHeight);
+        };
+
+        const computedQuestions = computed(() => {
+            return surveyStore.questions;
+        })
+
+        const drop = async (event) => {
+            console.log('you are dropping something')
+
+            if (draggedItemIndex.value !== null) {
+                const draggedItem = surveyStore.questions[draggedItemIndex.value];
+                surveyStore.questions.splice(draggedItemIndex.value, 1);
+                const dropIndex = placeholderIndex.value !== null ? placeholderIndex.value : surveyStore.questions.length;//Array.from(event.target.parentNode.children).indexOf(event.target);
+                surveyStore.questions.splice(dropIndex, 0, draggedItem);
+                console.log(`You are dragging item from ${draggedItemIndex.value} to ${dropIndex}`)
+                console.log(surveyStore.questions);
+                // Update the order in the database after drag-and-drop
+                /*try {
+                    const response = await axios.post('/api/updateQuestionOrder', {
+                        questions: surveyStore.questions,
+                    });
+                    console.log('Order updated successfully:', response.data);
+                } catch (error) {
+                    console.error('Error updating question order:', error);
+                }*/
+
+                draggedItemIndex.value = null;
+            }
+        };
+
+        // Watch for changes in the questions array and trigger a re-render
+        watch(() => surveyStore.questions, () => {});
 
         const editSurveyTitle = () => {
             editing_survey.value.title = true;
@@ -228,6 +277,13 @@ export default {
             surveyStore,
             newSurvey,
             survey_title_field,
+            draggedItemIndex,
+            placeholderIndex,
+            itemHeight,
+            computedQuestions,
+            startDrag,
+            dragOver,
+            drop,
             removeQuestion,
             focus_question,
             storeSurvey,
@@ -241,4 +297,10 @@ export default {
 </script>
 
 <style scoped>
+.placeholder {
+    border: 2px dashed #333; /* Example styling for the placeholder */
+    margin: 0;
+    padding: 0;
+    height: 40px; /* Adjust as needed */
+}
 </style>
