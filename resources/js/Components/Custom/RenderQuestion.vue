@@ -80,7 +80,8 @@
             <div class="flex-grow"></div>
             <!-- Switch for marking the question as required -->
             <div class="items-center pt-2">
-                <div class="tooltip" data-tip="Duplicate Question">
+                <span>{{ currentIndex }}</span>
+                <div class="tooltip" data-tip="Duplicate Question" @click="duplicateQuestion">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -186,6 +187,57 @@ export default {
                 });
         }, 1000); // Adjust the delay as needed (e.g., 1000ms)
 
+        const currentIndex = computed(() => {
+            return question.value.question_id
+            //return surveyStore.questions.findIndex(found => found.question_id === question.value.question_id);
+        });
+
+        /*const duplicateQuestion = () => {
+            // Find the index of the current question in surveyStore.questions
+            const index = surveyStore.questions.findIndex(element => element.question_id === question.value.question_id);
+            alert(index)
+
+            if (index !== -1) {
+                // Create a deep copy of the current question
+                const duplicatedQuestion = JSON.parse(JSON.stringify(question.value));
+
+                // Clear the question_id, so it's treated as a new question
+                duplicatedQuestion.question_id = null;
+
+                // Increment the index_number to place the duplicated question below the current one
+                duplicatedQuestion.index_number += 1;
+
+                // Insert the duplicated question into surveyStore.questions right after the current question
+                surveyStore.questions.splice(index + 1, 0, duplicatedQuestion);
+
+                // If needed, you can emit an event or perform additional actions here
+            }
+        };*/
+
+        const duplicateQuestion = () => {
+            const index = surveyStore.questions.findIndex(element => element.question_id === question.value.question_id);
+            //return alert(index);
+            // Step 1: Create a new question object (duplicated question)
+            const duplicatedQuestion = JSON.parse(JSON.stringify(surveyStore.questions[index])) //{ ...surveyStore.questions[index] };
+
+            // step 2: Set the question id to become null;
+            duplicatedQuestion.question_id = null;
+
+            //return console.log(duplicatedQuestion);
+
+            // Step 2: Split the array into two parts
+            const firstPart = surveyStore.questions.slice(0, index + 1);  // +1 to include the question at the specified index
+            const secondPart = surveyStore.questions.slice(index + 1);
+
+            // Step 3: Push the duplicated question into the first part
+            firstPart.push(duplicatedQuestion);
+
+            // Step 4: Update the surveyStore with the modified array
+            surveyStore.questions = JSON.parse(JSON.stringify([...firstPart, ...secondPart]));
+        };
+
+
+
         const focusOnInput = () => {
             setTimeout(() => {
                 const inputRef = `qn-${props.reference}`;
@@ -273,9 +325,11 @@ export default {
         return {
             question,
             focusingStyling,
+            currentIndex,
             focusOnInput,
             focusQuestion,
             deleteQuestion,
+            duplicateQuestion,
             addOption,
             removeOption,
             optionRef,
